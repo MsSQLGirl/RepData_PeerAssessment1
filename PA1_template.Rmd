@@ -93,7 +93,7 @@ plot(sca)
 Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 ```{r}
 names(mca)[2] <- "mean"
-
+names(mdca)[2] <- "median"
 aggca <- cbind(mca, mdca$median)
 
 names(aggca)[3] <- "median"
