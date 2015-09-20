@@ -7,19 +7,68 @@ output:
 
 
 ## Loading and preprocessing the data
-
-
-
+```{r}
+setwd("C:\\Users\\jukoesma\\Documents\\GitHub\\RepData_PeerAssessment1");
+unzip("activity.zip");
+activity <- read.csv("activity.csv");
+```
 ## What is mean total number of steps taken per day?
+```{r histogram}
+s = aggregate(activity$steps, by=list(date=activity$date), FUN=sum, na.rm = TRUE)
+plot(s$date, s$x, freq = TRUE, main = "Total Steps Per Day", border = par("fg"), 
+     density = NULL, angle = 45, lty = NULL, 
+     sub = NULL,  xlab = "date", ylab = "steps"
+     )
+# # hist(s)
+# hist(s, 
+#      main="Histogram for Air Passengers", 
+#      xlab="Passengers", 
+#      border="blue", 
+#      col="green",
+#      xlim=c(100,700),
+#      las=1, 
+#      breaks=5)
+ma <- aggregate(activity$steps, by=list(date=activity$date), FUN = mean, na.rm = TRUE)
+mda <- aggregate(activity$steps, by=list(date=activity$date), FUN = median, na.rm = TRUE)
+median(activity$steps, na.rm = TRUE)
+names(ma)[2] <- "mean"
+names(mda)[2] <- "median"
+agga <- cbind(ma, mda$median)
+names(agga)[3] <- "median"
+agga
 
-
+```
 
 ## What is the average daily activity pattern?
-
-
+```{r }
+a = aggregate(activity$steps, by=list(interval = activity$interval), FUN=mean, na.rm = TRUE)
+plot(a$interval, a$x, type = "l", xlab = "time", ylab = "steps")
+a[which.max(a$x), ]$interval
+# testts <- ts(activity, frequency=12)
+# head(testts)
+# head(activit)
+# head(activity, 20)
+#plot(x, y = NULL, plot.type = c("multiple", "single"),
+#        xy.labels, xy.lines, panel = lines, nc, yax.flip = FALSE,
+#        mar.multi = c(0, 5.1, 0, if(yax.flip) 5.1 else 2.1),
+#        oma.multi = c(6, 0, 5, 0), axes = TRUE, ...)
+```
 
 ## Imputing missing values
+```{r}
+m <- function(j) { a[a$interval == j,]$x }
 
-
+ca <- activity
+ca[is.na(ca$steps),]$steps <- sapply(ca[is.na(ca$steps),]$interval, FUN = m)
+sca <- aggregate(ca$steps, by=list(date=ca$date), FUN=sum, na.rm = TRUE)
+mca <- aggregate(ca$steps, by=list(date=ca$date), FUN=mean, na.rm = TRUE)
+mdca <- aggregate(ca$steps, by=list(date=ca$date), FUN=median, na.rm = TRUE)
+plot(sca)
+names(mca)[2] <- "mean"
+names(mdca)[2] <- "median"
+aggca <- cbind(mca, mdca$median)
+names(mdca)[3] <- "median"
+aggca
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
