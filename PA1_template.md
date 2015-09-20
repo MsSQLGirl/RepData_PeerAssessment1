@@ -341,10 +341,21 @@ awca <- aggregate(wca$steps, by=list(interval = wca$interval, weekend = wca$week
 
 # Draw
 library("lattice")
-xyplot(x~interval|weekend, data=awca,
+# par(mfrow=c(2,1))
+p <- xyplot(x~interval|weekend, data=awca,
     main="Average Steps",
     xlab="Intervals",
     ylab="Steps", type="l")
+update(p, layout=c(1,2))
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+
+```r
+dev.off()
+```
+
+```
+## null device 
+##           1
+```
