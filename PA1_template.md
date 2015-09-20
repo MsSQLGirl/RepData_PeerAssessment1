@@ -177,6 +177,8 @@ agga
 
 ## What is the average daily activity pattern?
 
+1.Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
 ```r
 a = aggregate(activity$steps, by=list(interval = activity$interval), FUN=mean, na.rm = TRUE)
 plot(a$interval, a$x, type = "l", xlab = "time", ylab = "steps")
@@ -184,23 +186,15 @@ plot(a$interval, a$x, type = "l", xlab = "time", ylab = "steps")
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
+2.Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+
 ```r
 a[which.max(a$x), ]$interval
 ```
 
 ```
 ## [1] 835
-```
-
-```r
-# testts <- ts(activity, frequency=12)
-# head(testts)
-# head(activit)
-# head(activity, 20)
-#plot(x, y = NULL, plot.type = c("multiple", "single"),
-#        xy.labels, xy.lines, panel = lines, nc, yax.flip = FALSE,
-#        mar.multi = c(0, 5.1, 0, if(yax.flip) 5.1 else 2.1),
-#        oma.multi = c(6, 0, 5, 0), axes = TRUE, ...)
 ```
 
 ## Imputing missing values
@@ -230,17 +224,9 @@ ca <- activity
 ca[is.na(ca$steps),]$steps <- sapply(ca[is.na(ca$steps),]$interval, FUN = m)
 ```
 
-4.Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+4.Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
 
 
-
-```r
-sum(is.na(activity$steps))
-```
-
-```
-## [1] 2304
-```
 
 ```r
 sca <- aggregate(ca$steps, by=list(date=ca$date), FUN=sum, na.rm = TRUE)
@@ -249,7 +235,8 @@ mdca <- aggregate(ca$steps, by=list(date=ca$date), FUN=median, na.rm = TRUE)
 plot(sca)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ```r
 names(mca)[2] <- "mean"
@@ -352,4 +339,4 @@ xyplot(x~interval|weekend, data=awca,
     ylab="Steps", type="l")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 

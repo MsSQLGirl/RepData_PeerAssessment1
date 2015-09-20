@@ -46,18 +46,17 @@ agga
 ```
 
 ## What is the average daily activity pattern?
+
+1.Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r }
 a = aggregate(activity$steps, by=list(interval = activity$interval), FUN=mean, na.rm = TRUE)
 plot(a$interval, a$x, type = "l", xlab = "time", ylab = "steps")
+```
+
+2.Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+```{r }
 a[which.max(a$x), ]$interval
-# testts <- ts(activity, frequency=12)
-# head(testts)
-# head(activit)
-# head(activity, 20)
-#plot(x, y = NULL, plot.type = c("multiple", "single"),
-#        xy.labels, xy.lines, panel = lines, nc, yax.flip = FALSE,
-#        mar.multi = c(0, 5.1, 0, if(yax.flip) 5.1 else 2.1),
-#        oma.multi = c(6, 0, 5, 0), axes = TRUE, ...)
 ```
 
 ## Imputing missing values
@@ -81,31 +80,32 @@ ca <- activity
 ca[is.na(ca$steps),]$steps <- sapply(ca[is.na(ca$steps),]$interval, FUN = m)
 ```
 
-4.Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+4.Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
 
 
 ```{r}
-sum(is.na(activity$steps))
-
-
 sca <- aggregate(ca$steps, by=list(date=ca$date), FUN=sum, na.rm = TRUE)
 mca <- aggregate(ca$steps, by=list(date=ca$date), FUN=mean, na.rm = TRUE)
 mdca <- aggregate(ca$steps, by=list(date=ca$date), FUN=median, na.rm = TRUE)
 plot(sca)
-names(mca)[2] <- "mean"
-names(mdca)[2] <- "median"
-aggca <- cbind(mca, mdca$median)
-aggca
 ```
+
+Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+```{r}
+names(mca)[2] <- "mean"
+
+aggca <- cbind(mca, mdca$median)
+
+names(aggca)[3] <- "median"
+aggca
+
+```
+Based on the values above, yes patterns look different, the mean is higher and the median has less NA values.
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 1.Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
-
-
-2.Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
-
-
 ```{r}
 # Define lbw function that determines if date is a weekend or not.
 lbw <- function(d) {weekdays(d, abbreviate = TRUE) %in% c("Sat", "sun")}
@@ -113,7 +113,14 @@ lbw <- function(d) {weekdays(d, abbreviate = TRUE) %in% c("Sat", "sun")}
 # Set weekend/weekdays value
 wca <- cbind(ca[, c("interval", "steps")], sapply(as.Date(ca$date), FUN = lbw))
 names(wca)[3] = "weekend"
-wca$weekend <- factor(wca$weekend, levels=c(TRUE, FALSE), labels=c("weekend", "weekdays"))
+wca.f <- factor(wca$weekend, levels=c(TRUE, FALSE), labels=c("weekend", "weekdays"))
+```
+
+2.Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+
+```{r}
+wca$weekend <- wca.f
  
 # Aggregate the values
 awca <- aggregate(wca$steps, by=list(interval = wca$interval, weekend = wca$weekend), FUN = mean)
