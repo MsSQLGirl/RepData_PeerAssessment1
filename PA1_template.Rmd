@@ -8,33 +8,39 @@ output:
 
 ## Loading and preprocessing the data
 ```{r}
-setwd("C:\\Users\\jukoesma\\Documents\\GitHub\\RepData_PeerAssessment1");
-unzip("activity.zip");
+# setwd("C:\\Users\\jukoesma\\Documents\\GitHub\\RepData_PeerAssessment1");
+# unzip("activity.zip");
 activity <- read.csv("activity.csv");
 ```
 ## What is mean total number of steps taken per day?
-```{r histogram}
+
+1.Calculate the total number of steps taken per day
+```{r}
 s = aggregate(activity$steps, by=list(date=activity$date), FUN=sum, na.rm = TRUE)
+s
+```
+
+
+2. If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
+```{r histogram}}
 plot(s$date, s$x, freq = TRUE, main = "Total Steps Per Day", border = par("fg"), 
      density = NULL, angle = 45, lty = NULL, 
      sub = NULL,  xlab = "date", ylab = "steps"
      )
-# # hist(s)
-# hist(s, 
-#      main="Histogram for Air Passengers", 
-#      xlab="Passengers", 
-#      border="blue", 
-#      col="green",
-#      xlim=c(100,700),
-#      las=1, 
-#      breaks=5)
+```
+
+3.Calculate and report the mean and median of the total number of steps taken per day
+```{r}
+# Calculating Mean and Median
 ma <- aggregate(activity$steps, by=list(date=activity$date), FUN = mean, na.rm = TRUE)
 mda <- aggregate(activity$steps, by=list(date=activity$date), FUN = median, na.rm = TRUE)
-median(activity$steps, na.rm = TRUE)
+
+# Tidying up the output
 names(ma)[2] <- "mean"
 names(mda)[2] <- "median"
 agga <- cbind(ma, mda$median)
-names(agga)[3] <- "median"
+
+# Produce the Results
 agga
 
 ```
@@ -55,11 +61,33 @@ a[which.max(a$x), ]$interval
 ```
 
 ## Imputing missing values
+
+1.Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 ```{r}
+sum(is.na(activity$steps))
+```
+
+2.Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+```{r}
+# Define a function that gets the corresponding mean values for the same interval
 m <- function(j) { a[a$interval == j,]$x }
 
+```
+
+3.Create a new dataset that is equal to the original dataset but with the missing data filled in.
+```{r}
+# New dataset is in ca
 ca <- activity
 ca[is.na(ca$steps),]$steps <- sapply(ca[is.na(ca$steps),]$interval, FUN = m)
+```
+
+4.Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+
+```{r}
+sum(is.na(activity$steps))
+
+
 sca <- aggregate(ca$steps, by=list(date=ca$date), FUN=sum, na.rm = TRUE)
 mca <- aggregate(ca$steps, by=list(date=ca$date), FUN=mean, na.rm = TRUE)
 mdca <- aggregate(ca$steps, by=list(date=ca$date), FUN=median, na.rm = TRUE)
@@ -67,8 +95,33 @@ plot(sca)
 names(mca)[2] <- "mean"
 names(mdca)[2] <- "median"
 aggca <- cbind(mca, mdca$median)
-names(mdca)[3] <- "median"
 aggca
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+1.Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+
+2.Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+
+```{r}
+# Define lbw function that determines if date is a weekend or not.
+lbw <- function(d) {weekdays(d, abbreviate = TRUE) %in% c("Sat", "sun")}
+
+# Set weekend/weekdays value
+wca <- cbind(ca[, c("interval", "steps")], sapply(as.Date(ca$date), FUN = lbw))
+names(wca)[3] = "weekend"
+wca$weekend <- factor(wca$weekend, levels=c(TRUE, FALSE), labels=c("weekend", "weekdays"))
+ 
+# Aggregate the values
+awca <- aggregate(wca$steps, by=list(interval = wca$interval, weekend = wca$weekend), FUN = mean)
+
+# Draw
+library("lattice")
+xyplot(x~interval|weekend, data=awca,
+    main="Average Steps",
+    xlab="Intervals",
+    ylab="Steps", type="l")
+```
